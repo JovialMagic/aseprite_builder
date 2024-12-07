@@ -1,16 +1,13 @@
-name: Build and deploy Aseprite
+name: Build and deploy Aseprite Target Tag Version
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'
   push:
     branches:
       - master
-      - fix
 
 env:
   BUILD_TYPE: Release
+  TagName: v1.3.10.1
 
 jobs:
   check-version:
@@ -25,7 +22,8 @@ jobs:
     - name: Get latest version info
       id: version_info
       run: |
-        data=$(curl -sL https://api.github.com/repos/aseprite/aseprite/releases/latest)
+        echo "begin curl -sL https://api.github.com/repos/aseprite/aseprite/releases/tags/${{ env.TagName }}"
+        data=$(curl -sL https://api.github.com/repos/aseprite/aseprite/releases/tags/${{ env.TagName }})
         LATEST_TAG=$(echo "${data}" | jq -r '.tag_name')
         DOWNLOAD_URL=$(echo "${data}" | jq -r '.assets[].browser_download_url')
         VERSION_INFO=$(echo "${data}" | jq -r '.body')
@@ -44,7 +42,6 @@ jobs:
         key: cached_version
     - name: Should we start new build?
       id: should_build
-      if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/fix' || steps.version_check.outputs.cache-hit != 'true'
       run: echo "should_build=true" >> $GITHUB_OUTPUT
     - name: Create Release
       id: create_release
