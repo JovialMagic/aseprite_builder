@@ -9,7 +9,7 @@ on:
 
 env:
   BUILD_TYPE: Release
-  TagName: v1.3.10.1
+  TagName: v1.3.11
 
 jobs:
   check-version:
